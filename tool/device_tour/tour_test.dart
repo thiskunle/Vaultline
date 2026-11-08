@@ -68,8 +68,39 @@ void main() {
     await wait(tester, const Duration(milliseconds: 1500));
     await shot(tester, '03_door_opening');
     await wait(tester, const Duration(seconds: 3));
-    expect(find.text('Your vault'), findsOneWidget);
+    expect(find.text('Authenticator'), findsOneWidget);
     await shot(tester, '04_vault_open');
+
+    // Add three accounts through the real UI (demo keys, not real secrets).
+    const demo = {
+      'GitHub': ('ada@example.com', 'JBSW Y3DP EHPK 3PXP'),
+      'Google': ('ada.lovelace@gmail.com', 'MFRGGZDFMZTWQ2LKNNWG23TPOBYXE43U'),
+      'Dropbox': ('ada@grambyte.ca', 'GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ'),
+    };
+    var first = true;
+    for (final MapEntry(key: issuer, value: (name, key)) in demo.entries) {
+      await tester.tap(find.byKey(Key(first ? 'add-first-account' : 'add-account')));
+      await wait(tester, const Duration(milliseconds: 700));
+      await tester.enterText(find.byKey(const Key('field-issuer')), issuer);
+      await tester.enterText(find.byKey(const Key('field-name')), name);
+      await tester.enterText(find.byKey(const Key('field-secret')), key);
+      await tester.testTextInput.receiveAction(TextInputAction.done);
+      await wait(tester, const Duration(milliseconds: 900));
+      if (first) {
+        // Close the keyboard and let the page transition fully settle.
+        FocusManager.instance.primaryFocus?.unfocus();
+        await wait(tester, const Duration(milliseconds: 1500));
+        await shot(tester, '05_add_account');
+      }
+      await tester.ensureVisible(find.byKey(const Key('save-account')));
+      await wait(tester, const Duration(milliseconds: 300));
+      await tester.tap(find.byKey(const Key('save-account')));
+      await wait(tester, const Duration(milliseconds: 900));
+      first = false;
+    }
+    await wait(tester, const Duration(milliseconds: 1500));
+    expect(find.text('Dropbox'), findsOneWidget);
+    await shot(tester, '06_codes');
 
     await tester.tap(find.byKey(const Key('lock-button')));
     await wait(tester, const Duration(seconds: 1));
@@ -89,6 +120,6 @@ void main() {
     await wait(tester, const Duration(milliseconds: 300));
     await shot(tester, '09_door_open');
     await wait(tester, const Duration(seconds: 3));
-    expect(find.text('Your vault'), findsOneWidget);
+    expect(find.text('Authenticator'), findsOneWidget);
   });
 }

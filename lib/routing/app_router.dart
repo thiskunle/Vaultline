@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../providers/vault_providers.dart';
+import '../screens/add_account_screen.dart';
 import '../screens/home_screen.dart';
 import '../screens/lock_screen.dart';
 import '../screens/setup_screen.dart';
@@ -13,6 +14,7 @@ abstract final class Routes {
   static const setup = '/setup';
   static const lock = '/lock';
   static const home = '/home';
+  static const addAccount = '/home/add';
 }
 
 CustomTransitionPage<void> _fade(GoRouterState state, Widget child) => CustomTransitionPage<void>(
@@ -46,13 +48,18 @@ final routerProvider = Provider<GoRouter>((ref) {
         },
         _ => Routes.splash,
       };
-      return here == target ? null : target;
+      // Screens inside the vault live under /home.
+      return here == target || here.startsWith('$target/') ? null : target;
     },
     routes: [
       GoRoute(path: Routes.splash, pageBuilder: (_, s) => _fade(s, const SplashScreen())),
       GoRoute(path: Routes.setup, pageBuilder: (_, s) => _fade(s, const SetupScreen())),
       GoRoute(path: Routes.lock, pageBuilder: (_, s) => _fade(s, const LockScreen())),
-      GoRoute(path: Routes.home, pageBuilder: (_, s) => _fade(s, const HomeScreen())),
+      GoRoute(
+        path: Routes.home,
+        pageBuilder: (_, s) => _fade(s, const HomeScreen()),
+        routes: [GoRoute(path: 'add', builder: (_, _) => const AddAccountScreen())],
+      ),
     ],
   );
   ref.onDispose(() {
