@@ -81,6 +81,9 @@ void main() {
     for (final MapEntry(key: issuer, value: (name, key)) in demo.entries) {
       await tester.tap(find.byKey(Key(first ? 'add-first-account' : 'add-account')));
       await wait(tester, const Duration(milliseconds: 700));
+      // The add-method sheet: type the key.
+      await tester.tap(find.byKey(const Key('add-via-key')));
+      await wait(tester, const Duration(milliseconds: 700));
       await tester.enterText(find.byKey(const Key('field-issuer')), issuer);
       await tester.enterText(find.byKey(const Key('field-name')), name);
       await tester.enterText(find.byKey(const Key('field-secret')), key);

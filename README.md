@@ -11,7 +11,7 @@ A Flutter authenticator and password vault for iOS and Android, built around a 3
   <img src="docs/screenshots/05_add_account.png" width="200" alt="Add an account with a live preview">
 </p>
 
-> **Status: early development.** Stages 1–2 (the lock and the authenticator) are complete; QR scanning and the encrypted password vault come next (see the roadmap). Vaultline has not had an independent security audit, so don't keep real secrets in it yet.
+> **Status: early development.** Stages 1–3 (the lock, the authenticator and QR setup) are complete; the encrypted password vault comes next (see the roadmap). Vaultline has not had an independent security audit, so don't keep real secrets in it yet.
 
 ## What works today
 
@@ -21,6 +21,7 @@ A Flutter authenticator and password vault for iOS and Android, built around a 3
 - **Brute-force protection.** After 5 wrong PINs the vault locks for 30 s. Each further miss doubles the wait, up to 15 minutes. The lockout is saved, so restarting the app doesn't reset it.
 - **Authenticator.** Standard 2FA codes (TOTP, RFC 6238), each with a countdown ring that turns amber in the last 5 seconds. Tap a code to copy it.
 - **Add accounts by setup key.** Paste or type the key from the service's 2FA settings; spaces, dashes and lowercase are fine. A live preview shows the code before you save, so you can check it matches. Advanced options cover 6 or 8 digits, 30 or 60-second periods, and SHA-1, SHA-256 or SHA-512.
+- **Add accounts by QR code.** Scan the setup QR code with the camera, or read it from a screenshot. Every scan opens a pre-filled form showing the live code, so nothing is added without your check. QR codes are decoded on the device (Apple Vision, bundled ML Kit) and never uploaded. Non-2FA codes, counter-based (HOTP) codes and Google Authenticator exports are rejected with a clear reason.
 - **Careful with your data.** Deleting an account asks for confirmation, and adding the same key twice is refused. If saved accounts ever can't be read, Vaultline shows an error instead of wiping them.
 
 ## Security design
@@ -40,7 +41,7 @@ On an iPhone 18 Pro simulator a PIN check takes about 0.5 s in a debug build, an
 
 1. ✅ Lock: PIN, biometrics, lockout, vault door
 2. ✅ Authenticator: RFC 6238 TOTP codes with countdown rings, tested against the RFC test vectors
-3. Add accounts by scanning a QR code (`otpauth://`)
+3. ✅ Add accounts by scanning a QR code (`otpauth://`), or from an image
 4. Password vault: AES-256-GCM encryption with a key protected by your PIN, plus a password generator
 5. Breach check through the Have I Been Pwned range API (k-anonymity: only 5 characters of the password's SHA-1 hash leave the device)
 6. Hardening: auto-lock, hiding the app in the app switcher, clearing copied codes from the clipboard
@@ -59,7 +60,7 @@ flutter run
 
 ```sh
 flutter analyze
-flutter test          # security + RFC test vectors + lock and authenticator flows
+flutter test          # security, RFC test vectors, otpauth:// parsing, lock/authenticator/scan flows
 
 # On a simulator/emulator, with real hashing and the real biometric plugin;
 # screenshots are saved to build/device_tour/<platform>/
@@ -71,13 +72,18 @@ TOUR_PLATFORM=ios flutter drive --driver=tool/device_tour/driver.dart \
 
 ```
 lib/
-  otp/        Base32, HOTP/TOTP (RFC 4648 / 4226 / 6238), no UI
+  otp/        Base32, HOTP/TOTP (RFC 4648 / 4226 / 6238), otpauth:// parser; no UI
   models/     authenticator account
   security/   PIN hashing, lock policy, secure storage, biometrics, account storage
   providers/  Riverpod state; the router follows the vault's lock state
-  screens/    setup, lock, authenticator, add account
+  screens/    setup, lock, authenticator, add account, QR scanner
   widgets/    vault door, PIN pad, account card + countdown ring
   theme/      design tokens
 ```
+
+### Platform notes
+
+- **Reading QR codes from image files** works on Android and real iPhones. The scanner plugin doesn't support it on the iOS Simulator, so there the app says so instead of failing silently.
+- **The live camera scanner** works on phones and the Android emulator's virtual camera. The iOS Simulator has no camera, so it shows a clear message instead.
 
 Built by [GramByte Technologies](https://grambyte.ca), Toronto.

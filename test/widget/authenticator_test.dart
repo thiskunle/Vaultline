@@ -40,6 +40,9 @@ void main() {
   Future<void> addAccount(WidgetTester tester, {String issuer = 'GitHub', String key = rfcKey}) async {
     final first = find.byKey(const Key('add-first-account'));
     await tester.tap(first.evaluate().isNotEmpty ? first : find.byKey(const Key('add-account')));
+    await settle(tester, steps: 5);
+    // The add-method sheet: choose to type the key.
+    await tester.tap(find.byKey(const Key('add-via-key')));
     await settle(tester);
     await tester.enterText(find.byKey(const Key('field-issuer')), issuer);
     await tester.enterText(find.byKey(const Key('field-name')), 'ada@example.com');

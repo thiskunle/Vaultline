@@ -14,7 +14,10 @@ import '../widgets/account_card.dart';
 /// Shows the live code as soon as the key is valid, so it can be checked
 /// against the service before saving.
 class AddAccountScreen extends ConsumerStatefulWidget {
-  const AddAccountScreen({super.key});
+  const AddAccountScreen({super.key, this.initial});
+
+  /// Pre-filled from a scanned QR code, for review before saving.
+  final OtpAccount? initial;
 
   @override
   ConsumerState<AddAccountScreen> createState() => _AddAccountScreenState();
@@ -35,6 +38,15 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> with Single
   @override
   void initState() {
     super.initState();
+    final a = widget.initial;
+    if (a != null) {
+      _issuer.text = a.issuer;
+      _name.text = a.name;
+      _secret.text = a.secret;
+      _digits = a.digits;
+      _period = a.period;
+      _algorithm = a.algorithm;
+    }
     for (final c in [_issuer, _name, _secret]) {
       c.addListener(() => setState(() {}));
     }
@@ -123,7 +135,7 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> with Single
     return Scaffold(
       appBar: AppBar(
         backgroundColor: VColors.night,
-        title: const Text('Add account'),
+        title: Text(widget.initial == null ? 'Add account' : 'Check and add'),
         leading: IconButton(tooltip: 'Cancel', icon: const Icon(Icons.close_rounded), onPressed: () => context.pop()),
       ),
       body: SafeArea(
@@ -131,8 +143,10 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> with Single
           padding: const EdgeInsets.fromLTRB(VSpace.page, VSpace.sm, VSpace.page, VSpace.xl),
           children: [
             Text(
-              'In the service’s security settings, turn on two-factor authentication and choose '
-              '“enter a setup key” (sometimes “can’t scan the QR code?”).',
+              widget.initial == null
+                  ? 'In the service’s security settings, turn on two-factor authentication and choose '
+                        '“enter a setup key” (sometimes “can’t scan the QR code?”).'
+                  : 'Scanned from a QR code. Check the details and that the code matches the service, then add it.',
               style: t.bodyMedium,
             ),
             const SizedBox(height: VSpace.lg),

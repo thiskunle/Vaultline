@@ -10,6 +10,10 @@
 	<string>Vaultline</string>
 	<key>NSFaceIDUsageDescription</key>
 	<string>Vaultline uses Face ID to unlock your vault.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Vaultline uses the camera to scan 2FA setup QR codes. Images stay on your device.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Vaultline reads a 2FA setup QR code from an image you choose. Images stay on your device.</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>

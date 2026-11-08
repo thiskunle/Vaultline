@@ -1,6 +1,7 @@
 // Shared helpers for widget tests: test doubles, app launch and PIN entry.
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/misc.dart' show Override;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:vaultline/app.dart';
 import 'package:vaultline/providers/vault_providers.dart';
@@ -30,6 +31,7 @@ Future<void> launch(
   MemorySecureStore store, {
   Biometrics? biometrics,
   DateTime Function()? clock,
+  List<Override> overrides = const [],
 }) async {
   tester.view.physicalSize = const Size(393, 852) * 3;
   tester.view.devicePixelRatio = 3;
@@ -43,6 +45,7 @@ Future<void> launch(
         biometricsProvider.overrideWithValue(biometrics ?? FakeBiometrics()),
         pinHasherProvider.overrideWithValue(const PinHasher(iterations: 1000, inBackground: false)),
         if (clock != null) clockProvider.overrideWithValue(clock),
+        ...overrides,
       ],
       child: const VaultlineApp(),
     ),

@@ -2,14 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
 import '../models/otp_account.dart';
 import '../providers/vault_providers.dart';
-import '../routing/app_router.dart';
 import '../security/biometrics.dart';
 import '../theme/app_theme.dart';
 import '../widgets/account_card.dart';
+import 'add_methods.dart';
 
 /// Inside the vault: the authenticator codes.
 class HomeScreen extends ConsumerStatefulWidget {
@@ -150,7 +149,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with SingleTickerProvid
                         body: 'Add the setup key from a service’s 2FA settings\nto start getting codes here.',
                         action: FilledButton.icon(
                           key: const Key('add-first-account'),
-                          onPressed: () => context.push(Routes.addAccount),
+                          onPressed: () => showAddMethods(context, ref),
                           icon: const Icon(Icons.add_rounded),
                           label: const Text('Add account'),
                         ),
@@ -180,7 +179,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with SingleTickerProvid
               key: const Key('add-account'),
               backgroundColor: VColors.accent,
               foregroundColor: VColors.night,
-              onPressed: () => context.push(Routes.addAccount),
+              onPressed: () => showAddMethods(context, ref),
               icon: const Icon(Icons.add_rounded),
               label: const Text('Add account', style: TextStyle(fontWeight: FontWeight.w700)),
             )

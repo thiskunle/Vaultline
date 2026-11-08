@@ -5,7 +5,9 @@ import 'package:go_router/go_router.dart';
 import '../providers/vault_providers.dart';
 import '../screens/add_account_screen.dart';
 import '../screens/home_screen.dart';
+import '../models/otp_account.dart';
 import '../screens/lock_screen.dart';
+import '../screens/scan_screen.dart';
 import '../screens/setup_screen.dart';
 import '../screens/splash_screen.dart';
 
@@ -15,6 +17,7 @@ abstract final class Routes {
   static const lock = '/lock';
   static const home = '/home';
   static const addAccount = '/home/add';
+  static const scan = '/home/scan';
 }
 
 CustomTransitionPage<void> _fade(GoRouterState state, Widget child) => CustomTransitionPage<void>(
@@ -58,7 +61,14 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: Routes.home,
         pageBuilder: (_, s) => _fade(s, const HomeScreen()),
-        routes: [GoRoute(path: 'add', builder: (_, _) => const AddAccountScreen())],
+        routes: [
+          // A scanned QR code arrives as `extra`, pre-filling the form.
+          GoRoute(
+            path: 'add',
+            builder: (_, s) => AddAccountScreen(initial: s.extra as OtpAccount?),
+          ),
+          GoRoute(path: 'scan', builder: (_, _) => const ScanScreen()),
+        ],
       ),
     ],
   );

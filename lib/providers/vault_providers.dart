@@ -7,6 +7,7 @@ import '../security/accounts_repository.dart';
 import '../security/biometrics.dart';
 import '../security/lock_service.dart';
 import '../security/pin_hasher.dart';
+import '../security/qr_sources.dart';
 import '../security/secure_store.dart';
 
 final secureStoreProvider = Provider<SecureStore>((ref) => const PlatformSecureStore());
@@ -88,3 +89,11 @@ final accountsProvider = AsyncNotifierProvider<AccountsController, List<OtpAccou
   AccountsController.new,
   retry: (_, _) => null,
 );
+
+/// Photo-library picker and on-device QR reader (overridden in tests).
+final imagePickerProvider = Provider<ImageSourcePicker>((ref) => PlatformImagePicker());
+final qrImageReaderProvider = Provider<QrImageReader>((ref) => PlatformQrImageReader());
+
+/// Live camera view for scanning (overridden in tests, where there is no
+/// camera).
+final qrCameraProvider = Provider<QrCameraBuilder>((ref) => platformQrCamera);
