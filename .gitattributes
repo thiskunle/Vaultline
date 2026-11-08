@@ -1,0 +1,10 @@
+# Normalise line endings so Windows and macOS checkouts stay identical.
+* text=auto eol=lf
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+*.png binary
+*.jpg binary
+*.jar binary
+*.ttf binary
+*.otf binary

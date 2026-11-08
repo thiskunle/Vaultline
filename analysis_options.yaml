@@ -1,0 +1,11 @@
+include: package:flutter_lints/flutter.yaml
+
+analyzer:
+  exclude:
+    - build/**
+    - android/**
+    - ios/**
+
+formatter:
+  # 120-character lines, consistent on Windows and macOS.
+  page_width: 120
